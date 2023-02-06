@@ -12,7 +12,6 @@ import {API_DRIVER} from "../../config";
 // TODO stavi go guessedPlayer u State const [guessedPlayer, setGuessedPlayer] = useState([])
 // TODO setGuessedPlayer(old => old.push(response.data))
 const Home = (props) => {
-    const [loading, setLoading] = useState(true);
     const [guessedPlayers, setGuessedPlayers] = useState([]);
     const [answers, setAnswers] = useState([]);
     const dispatch = useDispatch();
@@ -29,16 +28,14 @@ const Home = (props) => {
             API_DRIVER.get("api/player/user/getGuessed/" + selectedOptions.value)
                 .then(response => {
                     setGuessedPlayers(old => [...old, response.data]);
-                })
-                .finally(setGuessedPlayers(guessedPlayers));
+                });
+            setCounter(oldCounter => oldCounter + 1);
             console.log(guessedPlayers);
             API_DRIVER.get("api/player/user/compare/" + selectedOptions.value)
                 .then(response => {
                     setAnswers(old => [...old, response.data]);
-                })
-                .finally(setAnswers(answers));
+                });
             console.log(answers);
-            setCounter(counter + 1);
         }
     };
 
@@ -55,16 +52,12 @@ const Home = (props) => {
     });
 
     const handleSubmit = () => {
-        if(selectedOptions.value == null)
-            console.log("Nothing");
-        else {
-            dispatch(actions.getGuessedPlayer(selectedOptions.value));
-            dispatch(actions.compare(selectedOptions.value));
-            setFirst(false);
-            // console.log(counter);
-            console.log(props.guessedPlayer[counter]);
-            setCounter(counter + 1);
-        }
+        dispatch(actions.getGuessedPlayer(selectedOptions.value));
+        dispatch(actions.compare(selectedOptions.value));
+        setFirst(false);
+        // console.log(counter);
+        console.log(props.guessedPlayer[counter]);
+        setCounter(counter + 1);
     };
 
     return (
@@ -102,7 +95,12 @@ const Home = (props) => {
                         <TextField {...params} label="Player" variant="outlined" />
                     )}
                 />
-                <Button onClick={handleClick}>Guess!</Button>
+                <Button
+                    onClick={handleClick}
+                    disabled={!selectedOptions.value}
+                >
+                    Guess!
+                </Button>
 
                 <Box sx={{
                     marginTop: 5
